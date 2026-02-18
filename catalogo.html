@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LlenaloDstickers</title>
+<title>Catalogo - LlenaloDstickers</title>
 <link rel="stylesheet" href="css-c/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
 </head>
 <body>
 
@@ -39,44 +37,17 @@
   </div>
 </header>
 
+<main>
+  <section id="catalogo" class="catalogo-seccion container">
+    <h2 id="catalogoTitulo">Catalogo</h2>
+    <div id="categoriasMain" class="categorias"></div>
+    <div id="subcategorias" class="subcategorias"></div>
+    <div class="grid" id="grid-catalogo"></div>
+  </section>
+</main>
 
-
-
-
-<footer class="footer">
-  <p>&copy; LlenaloDstickers</p>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="js/js-s/carrito.js"></script>
-
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<script>
-  new Swiper('.heroSwiper', {
-    loop: true,
-    speed: 900,
-    effect: 'fade',
-    autoplay: {
-      delay: 4200,
-      disableOnInteraction: false
-    },
-    pagination: {
-      el: '.swiper-pagination',
-      clickable: true
-    },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev'
-    }
-  });
-
-  AOS.init({
-    duration: 850,
-    easing: 'ease-out-cubic',
-    once: true,
-    offset: 80
-  });
-</script>
-
+<script src="js/js-s/data.js"></script>
+<script src="js/js-s/catalogo.js"></script>
 </body>
 </html>
