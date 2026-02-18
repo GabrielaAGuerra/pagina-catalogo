@@ -2586,3 +2586,5 @@
   { id: "ST-YOU-047", nombre: "Sticker youtubers47", categoria: "youtubers", categoriaLabel: "Youtubers", categoriaPrincipal: "youtubers", categoriaPrincipalLabel: "Youtubers", subcategoria: "general", subcategoriaLabel: "General", tipo: "sticker", precio: 700, imagen: "images/Stickers/Youtubers/youtubers47.png" },
   { id: "ST-YOU-048", nombre: "Sticker youtubers48", categoria: "youtubers", categoriaLabel: "Youtubers", categoriaPrincipal: "youtubers", categoriaPrincipalLabel: "Youtubers", subcategoria: "general", subcategoriaLabel: "General", tipo: "sticker", precio: 700, imagen: "images/Stickers/Youtubers/youtubers48.png" }
 ];
+
+window.productos = productos;

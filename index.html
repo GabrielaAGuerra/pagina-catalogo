@@ -1,11 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogo | LlenaloD Stickers</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/catalogo.css">
+  <link rel="stylesheet" href="css/carrito.css">
+  <link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
-    <h1>Hello, World!</h1>
+  <header class="nav">
+    <div class="nav-top">
+      <h1>LlenaloDstickers</h1>
+      <div class="nav-actions">
+        <button id="openCategorias" class="nav-pill" type="button">Categorias</button>
+        <a class="nav-pill nav-link" href="personalizados.html">Personalizados</a>
+        <a class="nav-pill nav-link" href="admin.html">Admin</a>
+        <button id="openCart" type="button" aria-label="Abrir carrito">
+          🛒 <span id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+    <div id="categoriasNavPanel" class="categorias-nav-panel">
+      <div id="categoriasNav" class="categorias categorias-nav"></div>
+      <div id="subcategoriasNav" class="subcategorias subcategorias-nav"></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Catalogo de Stickers</h1>
+        <p>Elegi tus stickers favoritos, agregalos al carrito y envianos el pedido por WhatsApp.</p>
+        <div class="hero-buttons">
+          <a class="btn primary" href="#catalogo">Ver catalogo</a>
+          <a class="btn secondary" href="personalizados.html">Pedidos personalizados</a>
+        </div>
+      </div>
+      <img src="images/hero-stickers.png" alt="Hero stickers" class="hero-sticker">
+    </section>
+
+    <div id="categoriasMain" class="categorias"></div>
+    <div id="subcategorias" class="subcategorias"></div>
+
+    <section id="catalogo" class="catalogo-seccion">
+      <h2 id="catalogoTitulo">Catalogo</h2>
+      <div id="grid-catalogo" class="grid" aria-live="polite"></div>
+    </section>
+
+    <div id="categoriasBottom" class="categorias categorias-bottom"></div>
+  </main>
+
+  <div id="overlay" class="cart-overlay"></div>
+  <aside id="cart" class="cart" aria-label="Carrito de compras">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <h2 style="margin:0;">Tu carrito</h2>
+      <button type="button" class="btn-remove-item" onclick="cerrarCarrito()" aria-label="Cerrar carrito">✕</button>
+    </div>
+
+    <div id="cartItems" style="margin-top:14px;"></div>
+
+    <h3 style="margin:12px 0 0;">Total: $<span id="cartTotal">0</span></h3>
+
+    <form id="checkoutForm" class="checkout-form">
+      <label for="clienteNombre">Nombre</label>
+      <input id="clienteNombre" name="clienteNombre" maxlength="100" placeholder="Tu nombre" required>
+
+      <label for="clienteWhatsapp">WhatsApp</label>
+      <input id="clienteWhatsapp" name="clienteWhatsapp" maxlength="20" placeholder="11XXXXXXXX" required>
+
+      <button type="submit" class="btn-whatsapp">Enviar por WhatsApp</button>
+      <button id="clearCartBtn" type="button" class="btn-clear">Vaciar carrito</button>
+    </form>
+  </aside>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <h3>LlenaloDStickers</h3>
+        <p>
+          Stickers personalizados resistentes al agua.<br>
+          Anime, futbol, series y mas.
+        </p>
+      </div>
+      <div>
+        <h3>Contacto</h3>
+        <p>WhatsApp: 11 7363-3880</p>
+        <a href="https://wa.me/541173633880" target="_blank" rel="noopener noreferrer">Hacer pedido</a>
+      </div>
+      <div>
+        <h3>Seguinos</h3>
+        <a href="https://instagram.com/llenalodstickers" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-copy">
+      Ano 2026 LlenaloD Stickers - Hecho a mano en Argentina
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/backend.js"></script>
+  <script src="js/catalogo.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/carrito.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

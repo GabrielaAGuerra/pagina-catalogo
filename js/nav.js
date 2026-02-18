@@ -5,8 +5,12 @@ function initNav() {
 
   if (cartBtn) {
     cartBtn.onclick = () => {
-      document.getElementById("cart").classList.add("open");
-      document.getElementById("overlay").classList.add("show");
+      if (typeof toggleCart === "function") {
+        toggleCart(true);
+        return;
+      }
+      document.getElementById("cart")?.classList.add("open");
+      document.getElementById("overlay")?.classList.add("show");
     };
   }
 

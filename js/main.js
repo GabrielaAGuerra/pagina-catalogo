@@ -1,23 +1,35 @@
-function generarCodigoPorCategoria(productos) {
-  const contadores = new Map();
+function normalizarCatalogo(listado) {
+  if (!Array.isArray(listado)) return [];
 
-  productos.forEach((producto) => {
-    const categoria = String(producto.categoriaPrincipal || producto.categoria || "GEN");
-    const prefijo = categoria
-      .replace(/[^a-z0-9]/gi, "")
-      .slice(0, 3)
-      .toUpperCase()
-      .padEnd(3, "X");
+  const vistos = new Set();
+  const normalizados = [];
 
-    const siguiente = (contadores.get(categoria) || 0) + 1;
-    contadores.set(categoria, siguiente);
+  listado.forEach((producto, index) => {
+    if (!producto || !producto.imagen) return;
 
-    producto.nombre = `${prefijo}${String(siguiente).padStart(5, "0")}`;
+    const id = String(producto.id || `ST-AUTO-${index + 1}`);
+    const clave = `${id}|${producto.imagen}`;
+
+    if (vistos.has(clave)) {
+      return;
+    }
+
+    vistos.add(clave);
+    normalizados.push({
+      ...producto,
+      id,
+      nombre: producto.nombre || `Sticker ${index + 1}`,
+      precio: Number(producto.precio || 0)
+    });
   });
+
+  return normalizados;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  generarCodigoPorCategoria(productos);
+  const catalogo = normalizarCatalogo(typeof productos !== "undefined" ? productos : []);
+  window.productos = catalogo;
+
   initNav();
-  renderCatalogo(productos);
+  renderCatalogo(catalogo);
 });
