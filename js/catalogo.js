@@ -1,150 +1,118 @@
-﻿(function () {
-  const productos = Array.isArray(window.productos) ? window.productos : [];
+function renderCatalogo(productos) {
+  const mainWraps = [
+    document.getElementById("categoriasNav"),
+    document.getElementById("categoriasMain"),
+    document.getElementById("categoriasBottom")
+  ].filter(Boolean);
+  const subWraps = [
+    document.getElementById("subcategorias"),
+    document.getElementById("subcategoriasNav")
+  ].filter(Boolean);
+  const grid = document.getElementById("grid-catalogo");
+  const titulo = document.getElementById("catalogoTitulo");
+  if (mainWraps.length === 0 || subWraps.length === 0 || !grid || !titulo) return;
 
-  const categoriasEl = document.getElementById('categoriasMain');
-  const subcategoriasEl = document.getElementById('subcategorias');
-  const gridEl = document.getElementById('grid-catalogo');
-  const tituloEl = document.getElementById('catalogoTitulo');
+  const index = new Map();
 
-  if (!categoriasEl || !subcategoriasEl || !gridEl) return;
+  productos.forEach((p) => {
+    const mainId = p.categoriaPrincipal || p.categoria || "otros";
+    const mainLabel = p.categoriaPrincipalLabel || p.categoriaLabel || mainId;
+    const subId = p.subcategoria || "general";
+    const subLabel = p.subcategoriaLabel || "General";
 
-  let categoriaActiva = '';
-  let subcategoriaActiva = '';
-
-  const fmtMoney = (v) => Number(v || 0).toLocaleString('es-AR');
-
-  function esc(text) {
-    return String(text)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  function getCategorias() {
-    const map = new Map();
-    productos.forEach((p) => {
-      const slug = p.categoriaPrincipal || p.categoria || 'general';
-      const label = p.categoriaPrincipalLabel || p.categoriaLabel || 'General';
-      if (!map.has(slug)) map.set(slug, label);
-    });
-    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1], 'es'));
-  }
-
-  function getSubcategorias(cat) {
-    const map = new Map();
-    productos
-      .filter((p) => !cat || (p.categoriaPrincipal || p.categoria) === cat)
-      .forEach((p) => {
-        const slug = p.subcategoria || 'general';
-        const label = p.subcategoriaLabel || 'General';
-        if (!map.has(slug)) map.set(slug, label);
-      });
-    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1], 'es'));
-  }
-
-  function getFilteredProducts() {
-    return productos.filter((p) => {
-      const okCat = (p.categoriaPrincipal || p.categoria) === categoriaActiva;
-      const okSub = (p.subcategoria || 'general') === subcategoriaActiva;
-      return okCat && okSub;
-    });
-  }
-
-  function renderCategorias() {
-    const categorias = getCategorias();
-
-    if (!categoriaActiva && categorias.length) {
-      categoriaActiva = categorias[0][0];
+    if (!index.has(mainId)) {
+      index.set(mainId, { label: mainLabel, subcategorias: new Map() });
     }
 
-    const buttons = categorias
-      .map(([slug, label]) => {
-        const active = categoriaActiva === slug ? 'active' : '';
-        return `<button type="button" class="cat ${active}" data-cat="${esc(slug)}">${esc(label)}</button>`;
-      })
-      .join('');
+    const main = index.get(mainId);
+    if (!main.subcategorias.has(subId)) {
+      main.subcategorias.set(subId, { label: subLabel, productos: [] });
+    }
+    main.subcategorias.get(subId).productos.push(p);
+  });
 
-    categoriasEl.innerHTML = buttons;
+  const mainIds = Array.from(index.keys()).sort((a, b) => index.get(a).label.localeCompare(index.get(b).label));
+  let activeMain = mainIds[0];
+  let activeSub = null;
 
-    categoriasEl.querySelectorAll('.cat').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        categoriaActiva = btn.dataset.cat || '';
-        subcategoriaActiva = '';
-        renderAll();
-      });
+  function renderGrid() {
+    const mainData = index.get(activeMain);
+    if (!mainData) return;
+    const subData = mainData.subcategorias.get(activeSub);
+    const items = subData ? subData.productos : [];
+
+    titulo.textContent = `${mainData.label} - ${subData ? subData.label : ""}`.trim();
+    grid.innerHTML = "";
+
+    items.forEach((p) => {
+      const div = document.createElement("article");
+      div.className = "card";
+      div.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}">
+        <h3>${p.nombre}</h3>
+        <p>$${p.precio}</p>
+        <button class="btn-agregar" data-id="${p.id}">Agregar</button>
+      `;
+      grid.appendChild(div);
+    });
+
+    grid.querySelectorAll(".btn-agregar").forEach((btn) => {
+      btn.addEventListener("click", () => agregarAlCarrito(btn.dataset.id));
     });
   }
 
   function renderSubcategorias() {
-    const subs = getSubcategorias(categoriaActiva);
+    const mainData = index.get(activeMain);
+    if (!mainData) return;
 
-    if (!subcategoriaActiva && subs.length) {
-      subcategoriaActiva = subs[0][0];
+    const subIds = Array.from(mainData.subcategorias.keys()).sort((a, b) =>
+      mainData.subcategorias.get(a).label.localeCompare(mainData.subcategorias.get(b).label)
+    );
+
+    if (!subIds.includes(activeSub)) {
+      activeSub = subIds[0];
     }
 
-    const buttons = subs
-      .map(([slug, label]) => {
-        const active = subcategoriaActiva === slug ? 'active' : '';
-        return `<button type="button" class="subcat ${active}" data-sub="${esc(slug)}">${esc(label)}</button>`;
-      })
-      .join('');
-
-    subcategoriasEl.innerHTML = buttons;
-
-    subcategoriasEl.querySelectorAll('.subcat').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        subcategoriaActiva = btn.dataset.sub || '';
-        renderAll();
+    subWraps.forEach((subWrap) => {
+      subWrap.innerHTML = "";
+      subIds.forEach((subId) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `subcat ${subId === activeSub ? "active" : ""}`.trim();
+        btn.textContent = mainData.subcategorias.get(subId).label;
+        btn.addEventListener("click", () => {
+          activeSub = subId;
+          renderSubcategorias();
+          renderGrid();
+        });
+        subWrap.appendChild(btn);
       });
     });
   }
 
-  function renderGrid() {
-    const items = getFilteredProducts();
-
-    if (tituloEl) {
-      tituloEl.textContent = `Catalogo (${items.length})`;
-    }
-
-    if (!items.length) {
-      gridEl.innerHTML = '<p>No hay productos para los filtros seleccionados.</p>';
-      return;
-    }
-
-    gridEl.innerHTML = items
-      .map((p) => {
-        const nombre = esc(p.nombre || 'Sticker');
-        const imagen = esc(p.imagen || '');
-        const precio = Number(p.precio || 0);
-        return `
-          <article class="card producto">
-            <img src="${imagen}" alt="${nombre}" loading="lazy">
-            <h3>${nombre}</h3>
-            <p>$${fmtMoney(precio)}</p>
-            <button type="button" class="js-add" data-name="${nombre}" data-price="${precio}">Agregar</button>
-          </article>
-        `;
-      })
-      .join('');
-
-    gridEl.querySelectorAll('.js-add').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const name = btn.getAttribute('data-name') || 'Sticker';
-        const price = Number(btn.getAttribute('data-price') || 0);
-        if (typeof window.addToCart === 'function') {
-          window.addToCart(name, price);
-        }
+  function renderCategoriasMain() {
+    mainWraps.forEach((wrap) => {
+      wrap.innerHTML = "";
+      mainIds.forEach((mainId) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `cat ${mainId === activeMain ? "active" : ""}`.trim();
+        btn.textContent = index.get(mainId).label;
+        btn.addEventListener("click", () => {
+          activeMain = mainId;
+          activeSub = null;
+          renderCategoriasMain();
+          renderSubcategorias();
+          renderGrid();
+          document.querySelector(".nav")?.classList.remove("categorias-open");
+          document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        wrap.appendChild(btn);
       });
     });
   }
 
-  function renderAll() {
-    renderCategorias();
-    renderSubcategorias();
-    renderGrid();
-  }
-
-  renderAll();
-})();
+  renderCategoriasMain();
+  renderSubcategorias();
+  renderGrid();
+}
